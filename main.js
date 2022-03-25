@@ -6,9 +6,10 @@ let drawBasisVecs = true;
 let drawGridLines = true;
 let drawVectorLabels = false;
 let animSpeed = 1;
+let gridSize = 0;
 
 let vectors = [];
-
+let points = [];
 let matrices = [];
 
 let zoomFactor = 1;
@@ -18,7 +19,7 @@ const EXTRA_FACTOR = 1;
 const ANIM_SPEEDS = [
     {
         speed: 0,
-        name: 'None',
+        name: 'Off',
     },
     {
         speed: 120,
@@ -31,6 +32,20 @@ const ANIM_SPEEDS = [
     {
         speed: 6000,
         name: 'Slow',
+    },
+];
+const GRID_SIZES = [
+    {
+        size: 5,
+        name: 'Small',
+    },
+    {
+        size: 10,
+        name: 'Medium',
+    },
+    {
+        size: 25,
+        name: 'Large',
     },
 ];
 
@@ -140,17 +155,6 @@ function trans({ x, y }) {
     };
 }
 
-function niceRound(n) {
-    return Math.round((n + Number.EPSILON) * 100) / 100;
-}
-
-function flippedFloor(n) {
-    return (
-        Math.max(Math.abs(Math.floor(n)), Math.abs(Math.ceil(n))) *
-        (n < 0 ? -1 : 1)
-    );
-}
-
 function drawOrientGrid() {
     const orientColor = '#ccc';
 
@@ -202,9 +206,11 @@ function drawTransGrid() {
     // draw axes
     ctx.strokeStyle = gridsColor;
 
+    const gridCount = GRID_SIZES[gridSize].size;
+
     for (
-        let x = -1 * EXTRA_FACTOR * safetyX;
-        x <= EXTRA_FACTOR * safetyX;
+        let x = -1 * EXTRA_FACTOR * gridCount;
+        x <= EXTRA_FACTOR * gridCount;
         x += 1
     ) {
         ctx.beginPath();
@@ -215,16 +221,16 @@ function drawTransGrid() {
             ctx.lineWidth = 2;
         }
 
-        const pntStart = point(trans({ x, y: -1 * EXTRA_FACTOR * safetyY }));
-        const pntEnd = point(trans({ x, y: EXTRA_FACTOR * safetyY }));
+        const pntStart = point(trans({ x, y: -1 * EXTRA_FACTOR * gridCount }));
+        const pntEnd = point(trans({ x, y: EXTRA_FACTOR * gridCount }));
         ctx.moveTo(pntStart.x, pntStart.y);
         ctx.lineTo(pntEnd.x, pntEnd.y);
         ctx.stroke();
     }
 
     for (
-        let y = -1 * EXTRA_FACTOR * safetyY;
-        y <= EXTRA_FACTOR * safetyY;
+        let y = -1 * EXTRA_FACTOR * gridCount;
+        y <= EXTRA_FACTOR * gridCount;
         y += 1
     ) {
         ctx.beginPath();
@@ -235,8 +241,8 @@ function drawTransGrid() {
             ctx.lineWidth = 2;
         }
 
-        const pntStart = point(trans({ x: -1 * EXTRA_FACTOR * safetyX, y }));
-        const pntEnd = point(trans({ x: EXTRA_FACTOR * safetyX, y }));
+        const pntStart = point(trans({ x: -1 * EXTRA_FACTOR * gridCount, y }));
+        const pntEnd = point(trans({ x: EXTRA_FACTOR * gridCount, y }));
         ctx.moveTo(pntStart.x, pntStart.y);
         ctx.lineTo(pntEnd.x, pntEnd.y);
         ctx.stroke();
@@ -291,55 +297,19 @@ function drawPoint({ x, y }, color) {
 }
 
 function drawRainbowPoints() {
-    const countX = (safetyX - 1) * 2 + 1;
-    const countY = (safetyY - 1) * 2 + 1;
+    const gridCount = GRID_SIZES[gridSize].size;
+
+    const countX = (gridCount - 1) * 2 + 1;
+    const countY = (gridCount - 1) * 2 + 1;
     const totalPoints = countX * countY;
 
-    for (let y = -1 * safetyY + 1; y < safetyY; y += 1) {
-        for (let x = -1 * safetyX + 1; x < safetyX; x += 1) {
-            const pointId = (safetyY - 1 - y) * countX + x + safetyX - 1;
+    for (let y = -1 * gridCount + 1; y < gridCount; y += 1) {
+        for (let x = -1 * gridCount + 1; x < gridCount; x += 1) {
+            const pointId = (gridCount - 1 - y) * countX + x + gridCount - 1;
             const color = HSVtoRGB(pointId / totalPoints, 0.75, 1);
             drawPoint(trans({ x, y }), colorToString(color));
         }
     }
-}
-
-function matrixProduct() {
-    let result = { i: { x: 1, y: 0 }, j: { x: 0, y: 1 } };
-
-    matrices.forEach((matrix) => {
-        if (!matrix.isActive) return;
-
-        const oldIX = result.i.x;
-        const oldIY = result.i.y;
-        const oldJX = result.j.x;
-        const oldJY = result.j.y;
-        result.i.x = oldIX * matrix.i.x + oldJX * matrix.i.y;
-        result.i.y = oldIY * matrix.i.x + oldJY * matrix.i.y;
-
-        result.j.x = oldIX * matrix.j.x + oldJX * matrix.j.y;
-        result.j.y = oldIY * matrix.j.x + oldJY * matrix.j.y;
-    });
-
-    return result;
-}
-
-function isSameMatrix(a, b) {
-    return (
-        a.i.x === b.i.x && a.i.y === b.i.y && a.j.x === b.j.x && a.j.y === b.j.y
-    );
-}
-
-function lerpNum(a, b, t) {
-    const diff = b - a;
-    return a + diff * t;
-}
-
-function lerpMatrix(a, b, t) {
-    return {
-        i: { x: lerpNum(a.i.x, b.i.x, t), y: lerpNum(a.i.y, b.i.y, t) },
-        j: { x: lerpNum(a.j.x, b.j.x, t), y: lerpNum(a.j.y, b.j.y, t) },
-    };
 }
 
 const iX = document.querySelector('#i-x');
@@ -348,7 +318,7 @@ const jX = document.querySelector('#j-x');
 const jY = document.querySelector('#j-y');
 
 function draw(timestamp) {
-    const newMatrix = matrixProduct();
+    const newMatrix = matrixProduct(matrices);
     if (ANIM_SPEEDS[animSpeed].speed === 0) {
         startMatrix = endMatrix;
         endMatrix = newMatrix;
@@ -422,12 +392,25 @@ function draw(timestamp) {
     vectors.forEach((vec) => {
         if (!vec.isActive) return;
 
-        drawVector(trans(vec.vec), vec.color);
+        const transVec = trans(vec.vec);
+        drawVector(transVec, vec.color);
         if (drawVectorLabels) {
-            const transVec = trans(vec.vec);
             labelledText(
                 `[${niceRound(transVec.x)}, ${niceRound(transVec.y)}]`,
                 transVec,
+            );
+        }
+    });
+
+    points.forEach((point) => {
+        if (!point.isActive) return;
+
+        const transPnt = trans(point.coord);
+        drawPoint(trans(point.coord), point.color);
+        if (drawVectorLabels) {
+            labelledText(
+                `(${niceRound(transPnt.x)}, ${niceRound(transPnt.y)})`,
+                transPnt,
             );
         }
     });

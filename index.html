@@ -49,17 +49,43 @@
     <body>
         <div class="sidebar">
             <h1 class="header">🤖 Matrix Math</h1>
-            <div id="controls">
-                <button id="rainbow">Turn on rainbow points</button>
-                <button id="basisvecs">Turn off î and ĵ</button>
-                <button id="grid">Turn off grid</button>
-                <button id="veclabels">Turn on vector labels</button>
-                <button id="speed">Change animation speed (Fast)</button>
+            <div id="menu" class="is-closed">
+                <div id="menu-header">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="currentColor"
+                        class="bi bi-caret-down-fill"
+                        viewBox="0 0 16 16"
+                        id="menu-open"
+                    >
+                        <path
+                            d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"
+                        />
+                    </svg>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="currentColor"
+                        class="bi bi-caret-right-fill"
+                        viewBox="0 0 16 16"
+                        id="menu-closed"
+                    >
+                        <path
+                            d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+                        />
+                    </svg>
+                    <span>Options</span>
+                </div>
+                <div id="controls">
+                    <button id="rainbow">Turn on rainbow points</button>
+                    <button id="basisvecs">Turn off î and ĵ</button>
+                    <button id="size">Change grid size (Small)</button>
+                    <button id="grid">Turn off grid</button>
+                    <button id="veclabels">Turn on vector labels</button>
+                    <button id="speed">Change animation speed (Fast)</button>
+                </div>
             </div>
             <div class="eqn">
-                <h2>Vectors</h2>
-                <p>Observe how the position of vectors changes.</p>
-                <p>Drag a cell to change its value.</p>
+                <h2 id="basis-header">Basis vectors</h2>
                 <div id="basis">
                     <div class="vector">
                         <span
@@ -90,19 +116,25 @@
                         </table>
                     </div>
                 </div>
+                <h2 id="matrices-header">Matrices</h2>
+                <p>Add matrices to transform the space.</p>
+                <div id="matrices">
+                    <div id="matrixlist"></div>
+                    <button id="addmatrix">Add Matrix</button>
+                </div>
+
+                <h2 id="vectors-header">Vectors</h2>
+                <p>Observe how the position of vectors changes.</p>
                 <div id="vectors">
                     <div id="vectorlist"></div>
                     <button id="addvector">Add Vector</button>
                 </div>
-                <h2>Matrices</h2>
-                <p>Add matrices to transform the space.</p>
-                <p>
-                    Matrices are applied top to bottom. Drag the matrix cards to
-                    change the order. Drag a cell to change its value.
-                </p>
-                <div id="matrices">
-                    <div id="matrixlist"></div>
-                    <button id="addmatrix">Add Matrix</button>
+
+                <h2 id="points-header">Points</h2>
+                <p>Observe how the position of points changes.</p>
+                <div id="points">
+                    <div id="pointlist"></div>
+                    <button id="addpoint">Add Point</button>
                 </div>
             </div>
             <div class="footer">
@@ -120,9 +152,6 @@
             <button id="zoomin">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
                     class="bi bi-zoom-in"
                     viewBox="0 0 16 16"
                 >
@@ -142,9 +171,6 @@
             <button id="zoomout">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
                     class="bi bi-zoom-out"
                     viewBox="0 0 16 16"
                 >
@@ -184,9 +210,6 @@
                 <button class="delete">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
                         class="bi bi-trash-fill"
                         viewBox="0 0 16 16"
                     >
@@ -200,7 +223,7 @@
         <template id="matrix-card">
             <div class="matrix-input">
                 <input type="checkbox" class="enable" checked />
-                <div class="matrix-card">
+                <div class="matrix-container">
                     <table class="matrix">
                         <tr>
                             <td>
@@ -239,9 +262,29 @@
                 <button class="delete">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
+                        class="bi bi-trash-fill"
+                        viewBox="0 0 16 16"
+                    >
+                        <path
+                            d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"
+                        />
+                    </svg>
+                </button>
+            </div>
+        </template>
+        <template id="point-card">
+            <div class="point-input">
+                <input type="checkbox" class="enable" checked />
+                <div class="point">
+                    <span>(</span>
+                    <input type="number" value="1" class="cell x" />
+                    <span>,</span>
+                    <input type="number" value="1" class="cell y" />
+                    <span>)</span>
+                </div>
+                <button class="delete">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
                         class="bi bi-trash-fill"
                         viewBox="0 0 16 16"
                     >
@@ -253,15 +296,17 @@
             </div>
         </template>
 
+        <script src="https://unpkg.com/@popperjs/core@2"></script>
+        <script src="https://unpkg.com/tippy.js@6"></script>
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"
             integrity="sha512-Eezs+g9Lq4TCCq0wae01s9PuNWzHYoCMkE97e2qdkYthpI0pzC3UGB03lgEHn2XM85hDOUF6qgqqszs+iXU4UA=="
             crossorigin="anonymous"
             referrerpolicy="no-referrer"
         ></script>
-        <script src="colors.js"></script>
+        <script src="utils.js"></script>
         <script src="main.js"></script>
         <script src="controls.js"></script>
-        <script src="sort.js"></script>
+        <script src="sortandpop.js"></script>
     </body>
 </html>

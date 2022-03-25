@@ -1,3 +1,7 @@
+* {
+    touch-action: manipulation;
+}
+
 html,
 body {
     margin: 0;
@@ -91,12 +95,13 @@ input[type='checkbox']:checked::after {
 
 .eqn p {
     margin: 0;
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 #addvector,
-#addmatrix {
+#addmatrix,
+#addpoint {
     margin-top: 0.5rem;
 }
 
@@ -156,7 +161,7 @@ input[type='checkbox']:checked::after {
     padding: 0.1rem;
     background: #e8e8e8;
     text-align: center;
-    cursor: row-resize;
+    cursor: ns-resize;
 }
 
 .cell.is-dragging {
@@ -187,13 +192,68 @@ input[type='number'] {
     margin: 0.5rem;
 }
 
+#menu {
+    border: 2px solid #222;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    background: #eee;
+    transition: background 0.1s;
+    margin: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#menu-header:hover {
+    background: #ddd;
+}
+
+#menu-header {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    border-radius: 0.5rem;
+}
+
+#menu-header > span {
+    margin-left: 1rem;
+    font-size: 1.2rem;
+}
+
+#menu-closed,
+#menu-open {
+    fill: '#222';
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+#menu.is-closed #menu-open,
+#menu #menu-closed {
+    display: none;
+}
+
+#menu.is-closed #menu-closed,
+#menu #menu-open {
+    display: inline;
+}
+
 #controls {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
+    /* flex-wrap: wrap; */
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
     padding: 0.5rem;
+    margin-top: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#menu.is-closed > #controls {
+    display: none;
 }
 
 #controls button {
@@ -315,22 +375,50 @@ button:hover {
     background: #e8e8e8;
     border-radius: 0.5rem;
     border: 2px solid #666;
+    cursor: move;
 }
 
 .matrix-input.is-sorting {
     background: #d4d7ff;
 }
 
-.matrix-input > .matrix-card {
+.matrix-input > .matrix-container {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
+.point-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 0.5rem 0;
+    padding: 0.8rem 1rem;
+    background: #e8e8e8;
+    border-radius: 0.5rem;
+    border: 2px solid #666;
+}
+
+.point {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em 0.5em;
+    background-repeat: no-repeat;
+    background-size: 8px 2px;
+    background-position: top left, top right, bottom left, bottom right;
+    font-family: 'Roboto Mono', monospace;
+}
+
 @media (max-width: 600px) {
     body {
         flex-direction: column;
+    }
+
+    .main {
+        border-radius: 0 0.75rem 0.75rem;
     }
 
     .sidebar {

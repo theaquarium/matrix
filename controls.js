@@ -1,3 +1,7 @@
+document.querySelector('#menu-header').addEventListener('click', (e) => {
+    document.querySelector('#menu').classList.toggle('is-closed');
+});
+
 document.querySelector('#rainbow').addEventListener('click', (e) => {
     drawRainbows = !drawRainbows;
     e.target.innerText = `${
@@ -32,6 +36,12 @@ document.querySelector('#speed').addEventListener('click', (e) => {
     draw();
 });
 
+document.querySelector('#size').addEventListener('click', (e) => {
+    gridSize = (gridSize + 1) % GRID_SIZES.length;
+    e.target.innerText = `Change grid size (${GRID_SIZES[gridSize].name})`;
+    draw();
+});
+
 const vectorTemplate = document.querySelector('#vector-card');
 const vectorList = document.querySelector('#vectorlist');
 const addVector = document.querySelector('#addvector');
@@ -60,7 +70,7 @@ addVector.addEventListener('click', () => {
     });
 
     const checkbox = vectorCard.querySelector('.enable');
-    // it's allowed here because we just added it
+
     const index = vectors.findIndex((vec) => vec.id === id);
     checkbox.style.backgroundColor = checkbox.checked
         ? vectors[index].color
@@ -107,6 +117,81 @@ addVector.addEventListener('click', () => {
     vectorList.append(vectorCard);
 });
 
+const pointTemplate = document.querySelector('#point-card');
+const pointList = document.querySelector('#pointlist');
+const addPoint = document.querySelector('#addpoint');
+
+let pointIdTracker = 0;
+
+addPoint.addEventListener('click', () => {
+    const pointCard = pointTemplate.content.firstElementChild.cloneNode(true);
+    const id = pointIdTracker++;
+
+    pointCard.dataset.id = id;
+
+    points.push({
+        id,
+        isActive: true,
+        color: colorToString(randomColor()),
+        coord: { x: 1, y: 1 },
+    });
+    draw();
+
+    pointCard.querySelector('.delete').addEventListener('click', () => {
+        pointCard.remove();
+        const index = points.findIndex((pnt) => pnt.id === id);
+        if (index > -1) points.splice(index, 1);
+        draw();
+    });
+
+    const checkbox = pointCard.querySelector('.enable');
+
+    const index = points.findIndex((pnt) => pnt.id === id);
+    checkbox.style.backgroundColor = checkbox.checked
+        ? points[index].color
+        : null;
+
+    checkbox.addEventListener('change', () => {
+        const index = vectors.findIndex((vec) => vec.id === id);
+        vectors[index] = {
+            ...vectors[index],
+            isActive: checkbox.checked,
+        };
+        checkbox.style.backgroundColor = checkbox.checked
+            ? vectors[index].color
+            : null;
+        draw();
+    });
+
+    const cellX = pointCard.querySelector('.cell.x');
+    const cellY = pointCard.querySelector('.cell.y');
+
+    const readPointValues = () => {
+        const asNumX = parseFloat(cellX.value);
+        const asNumY = parseFloat(cellY.value);
+        if (!isNaN(asNumX) && !isNaN(asNumY)) {
+            const index = points.findIndex((pnt) => pnt.id === id);
+            points[index] = {
+                ...points[index],
+                coord: {
+                    x: asNumX,
+                    y: asNumY,
+                },
+            };
+            draw();
+        }
+    };
+
+    cellX.addEventListener('input', readPointValues);
+    cellY.addEventListener('input', readPointValues);
+    makeDraggable(cellX, readPointValues);
+    makeDraggable(cellY, readPointValues);
+    addDblClick(cellX, readPointValues);
+    addDblClick(cellY, readPointValues);
+
+    pointList.append(pointCard);
+});
+
 const matrixTemplate = document.querySelector('#matrix-card');
 const matrixList = document.querySelector('#matrixlist');
 const addMatrix = document.querySelector('#addmatrix');
@@ -135,11 +220,6 @@ addMatrix.addEventListener('click', () => {
     });
 
     const checkbox = matrixCard.querySelector('.enable');
-    // it's allowed here because we just added it
-    const index = matrices.findIndex((mat) => mat.id === id);
-    checkbox.style.backgroundColor = checkbox.checked
-        ? matrices[index].color
-        : null;
 
     checkbox.addEventListener('change', () => {
         const index = matrices.findIndex((mat) => mat.id === id);
