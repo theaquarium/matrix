@@ -26,7 +26,7 @@ document.querySelector('#veclabels').addEventListener('click', (e) => {
     drawVectorLabels = !drawVectorLabels;
     e.target.innerText = `${
         drawVectorLabels ? 'Turn off' : 'Turn on'
-    } vector labels`;
+    } vector/point labels`;
     draw();
 });
 
