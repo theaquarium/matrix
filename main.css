@@ -1,0 +1,346 @@
+html,
+body {
+    margin: 0;
+    background: #dadada;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: row;
+
+    font-size: 1.2rem;
+}
+
+a {
+    color: #444;
+
+    text-decoration: none;
+    border-bottom: 1px dotted #333;
+
+    transition: 0.1s color;
+}
+
+a:hover {
+    color: #222;
+
+    border-bottom: 1px solid #222;
+}
+
+input[type='checkbox'] {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    vertical-align: middle;
+    outline: none;
+    font-size: inherit;
+    cursor: pointer;
+    width: 1.3em;
+    height: 1.3em;
+    background: #ccc;
+    border-radius: 0.25em;
+    border: 0.125em solid #222;
+    position: relative;
+    margin-right: 0.5rem;
+    margin-left: 0;
+}
+
+input[type='checkbox']:checked {
+    background: #d7fbe1;
+}
+
+input[type='checkbox']:checked::after {
+    font-family: 'Roboto Mono', sans-serif;
+    content: '✔';
+    position: absolute;
+    font-size: 90%;
+    left: 0.15em;
+    top: -0.15em;
+}
+
+.sidebar {
+    background: #dadada;
+    width: 30%;
+    min-width: 22rem;
+    height: 100vh;
+    flex-shrink: 0;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.header {
+    flex-shrink: 0;
+}
+
+.eqn {
+    flex-grow: 1;
+    overflow: auto;
+    padding: 0.5rem 1rem;
+    padding-bottom: 1.5rem;
+}
+
+.eqn h2 {
+    margin: 0.6rem 0;
+    margin-top: 1rem;
+}
+
+.eqn p {
+    margin: 0;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+#addvector,
+#addmatrix {
+    margin-top: 0.5rem;
+}
+
+.footer {
+    padding: 1rem;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 1rem;
+    color: #222;
+}
+
+.main {
+    background: #eee;
+    flex-grow: 1;
+    box-shadow: inset 0px 0px 5px #00000055;
+    border-radius: 0.75rem 0 0 0.75rem;
+    overflow: hidden;
+}
+
+#canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.matrix {
+    --border-color: #222;
+
+    display: inline-table;
+    /* position: absolute; */
+    border-left: 2px solid var(--border-color);
+    border-right: 2px solid var(--border-color);
+    padding: 0.25em 0.5em;
+    background-image: linear-gradient(var(--border-color), var(--border-color)),
+        linear-gradient(var(--border-color), var(--border-color)),
+        linear-gradient(var(--border-color), var(--border-color)),
+        linear-gradient(var(--border-color), var(--border-color));
+
+    background-repeat: no-repeat;
+    background-size: 8px 2px;
+    background-position: top left, top right, bottom left, bottom right;
+
+    font-family: 'Roboto Mono', monospace;
+}
+
+.rawcell {
+    text-align: center;
+    width: 3rem;
+}
+
+.cell {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.2rem;
+    width: 2.5rem;
+    outline: none;
+    border: 1px solid #222;
+    border-radius: 2px;
+    padding: 0.1rem;
+    background: #e8e8e8;
+    text-align: center;
+    cursor: row-resize;
+}
+
+.cell.is-dragging {
+    background: #fff5ca;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+#basis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+#basis > .vector {
+    margin: 0.5rem;
+}
+
+#controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+#controls button {
+    margin: 0.25rem;
+}
+
+button {
+    border: 2px solid #222;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    /* margin: 0.5rem; */
+    cursor: pointer;
+    background: #eee;
+    transition: background 0.1s;
+}
+
+button:hover {
+    background: #ddd;
+}
+
+.vector-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 0.5rem 0;
+    padding: 0.8rem 1rem;
+    background: #e8e8e8;
+    border-radius: 0.5rem;
+    border: 2px solid #666;
+}
+
+.vector {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vector > span {
+    /* position: relative; */
+    /* top: 0.45rem; */
+    margin-right: 0.5rem;
+    /* flex-wrap: nowrap; */
+    white-space: nowrap;
+}
+
+.vector-name {
+    font-weight: 600;
+    font-family: 'Roboto Mono', monospace;
+}
+
+#ihat,
+#jhat {
+    padding: 0.2rem;
+    border-radius: 0.25rem;
+}
+
+#ihat {
+    background: #ff0000;
+}
+
+#jhat {
+    background: #0000ff;
+    color: #fff;
+}
+
+.delete {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    margin: 0;
+}
+
+.delete > svg {
+    fill: '#222';
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.enable {
+    margin-right: 0.5rem;
+}
+
+#zoombuttons {
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
+}
+
+#zoomin,
+#zoomout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    margin: 0.5rem;
+}
+
+#zoomin > svg,
+#zoomout > svg {
+    fill: '#222';
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.matrix-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 0.5rem 0;
+    padding: 0.8rem 1rem;
+    background: #e8e8e8;
+    border-radius: 0.5rem;
+    border: 2px solid #666;
+}
+
+.matrix-input.is-sorting {
+    background: #d4d7ff;
+}
+
+.matrix-input > .matrix-card {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 600px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        height: 40vh;
+        width: 100%;
+        order: 2;
+        overflow: scroll;
+    }
+
+    .eqn {
+        overflow: initial;
+    }
+}
