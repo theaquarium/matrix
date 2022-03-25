@@ -436,9 +436,14 @@ function draw(timestamp) {
 }
 
 // Start
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
     init();
     draw();
+
+    setTimeout(() => {
+        init();
+        draw();
+    }, 500);
 });
 
 let throttlePause;
