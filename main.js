@@ -264,30 +264,45 @@ function drawVector({ x, y }, color) {
     ctx.strokeStyle = color;
     ctx.lineWidth = 5;
 
-    const pntStart = point({ x: 0, y: 0 });
-    const pntEnd = point({ x, y });
-    ctx.moveTo(pntStart.x, pntStart.y);
-    ctx.lineTo(pntEnd.x, pntEnd.y);
-    ctx.stroke();
-
     // base of equil triangle
     const TRIANGLE_SIZE = 25;
     const theta = Math.atan2(y, x);
 
+    const triangleXOffset =
+        -1 * Math.cos(theta) * (Math.sqrt(3) / 2) * TRIANGLE_SIZE;
+    const triangleYOffset =
+        Math.sin(theta) * (Math.sqrt(3) / 2) * TRIANGLE_SIZE;
+
+    // vector line
+    const pntStart = point({ x: 0, y: 0 });
+    const pntEnd = point({ x, y });
+    ctx.moveTo(pntStart.x, pntStart.y);
+    ctx.lineTo(pntEnd.x + triangleXOffset, pntEnd.y + triangleYOffset);
+    ctx.stroke();
+
+    // bottom left vertex
     ctx.beginPath();
     ctx.fillStyle = color;
     ctx.moveTo(
-        pntEnd.x - (Math.sin(theta) * TRIANGLE_SIZE) / 2,
-        pntEnd.y - (Math.cos(theta) * TRIANGLE_SIZE) / 2,
+        pntEnd.x - (Math.sin(theta) * TRIANGLE_SIZE) / 2 + triangleXOffset,
+        pntEnd.y - (Math.cos(theta) * TRIANGLE_SIZE) / 2 + triangleYOffset,
     );
 
     // height of triangle
     const h = TRIANGLE_SIZE * Math.sin(Math.PI / 3);
-    ctx.lineTo(pntEnd.x + Math.cos(theta) * h, pntEnd.y - Math.sin(theta) * h);
+
+    // top vertex
     ctx.lineTo(
-        pntEnd.x + (Math.sin(theta) * TRIANGLE_SIZE) / 2,
-        pntEnd.y + (Math.cos(theta) * TRIANGLE_SIZE) / 2,
+        pntEnd.x + Math.cos(theta) * h + triangleXOffset,
+        pntEnd.y - Math.sin(theta) * h + triangleYOffset,
     );
+
+    // bottom right vertex
+    ctx.lineTo(
+        pntEnd.x + (Math.sin(theta) * TRIANGLE_SIZE) / 2 + triangleXOffset,
+        pntEnd.y + (Math.cos(theta) * TRIANGLE_SIZE) / 2 + triangleYOffset,
+    );
+
     ctx.closePath();
     ctx.fill();
 }
@@ -383,7 +398,6 @@ function draw(timestamp) {
     requestAnimationFrame(draw);
 
     const newMatrix = matrixProduct(matrices);
-    // const newMatrix = liveMatrix.matrix;
     if (ANIM_SPEEDS[animSpeed].speed === 0) {
         startMatrix = endMatrix;
         endMatrix = newMatrix;
