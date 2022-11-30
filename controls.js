@@ -7,39 +7,39 @@ document.querySelector('#rainbow').addEventListener('click', (e) => {
     e.target.innerText = `${
         drawRainbows ? 'Turn off' : 'Turn on'
     } rainbow points`;
-    draw();
+    // draw();
 });
 
 document.querySelector('#basisvecs').addEventListener('click', (e) => {
     drawBasisVecs = !drawBasisVecs;
     e.target.innerText = `${drawBasisVecs ? 'Turn off' : 'Turn on'} î and ĵ`;
-    draw();
+    // draw();
 });
 
 document.querySelector('#grid').addEventListener('click', (e) => {
     drawGridLines = !drawGridLines;
     e.target.innerText = `${drawGridLines ? 'Turn off' : 'Turn on'} grid`;
-    draw();
+    // draw();
 });
 
 document.querySelector('#veclabels').addEventListener('click', (e) => {
     drawVectorLabels = !drawVectorLabels;
     e.target.innerText = `${
         drawVectorLabels ? 'Turn off' : 'Turn on'
-    } vector/point labels`;
-    draw();
+    } object labels`;
+    // draw();
 });
 
 document.querySelector('#speed').addEventListener('click', (e) => {
     animSpeed = (animSpeed + 1) % ANIM_SPEEDS.length;
     e.target.innerText = `Change animation speed (${ANIM_SPEEDS[animSpeed].name})`;
-    draw();
+    // draw();
 });
 
 document.querySelector('#size').addEventListener('click', (e) => {
     gridSize = (gridSize + 1) % GRID_SIZES.length;
     e.target.innerText = `Change grid size (${GRID_SIZES[gridSize].name})`;
-    draw();
+    // draw();
 });
 
 const vectorTemplate = document.querySelector('#vector-card');
@@ -60,13 +60,13 @@ addVector.addEventListener('click', () => {
         color: colorToString(randomColor()),
         vec: { x: 1, y: 1 },
     });
-    draw();
+    // draw();
 
     vectorCard.querySelector('.delete').addEventListener('click', () => {
         vectorCard.remove();
         const index = vectors.findIndex((vec) => vec.id === id);
         if (index > -1) vectors.splice(index, 1);
-        draw();
+        // draw();
     });
 
     const checkbox = vectorCard.querySelector('.enable');
@@ -85,7 +85,7 @@ addVector.addEventListener('click', () => {
         checkbox.style.backgroundColor = checkbox.checked
             ? vectors[index].color
             : null;
-        draw();
+        // draw();
     });
 
     const cellX = vectorCard.querySelector('.cell.x');
@@ -103,7 +103,7 @@ addVector.addEventListener('click', () => {
                     y: asNumY,
                 },
             };
-            draw();
+            // draw();
         }
     };
 
@@ -135,13 +135,13 @@ addPoint.addEventListener('click', () => {
         color: colorToString(randomColor()),
         coord: { x: 1, y: 1 },
     });
-    draw();
+    // draw();
 
     pointCard.querySelector('.delete').addEventListener('click', () => {
         pointCard.remove();
         const index = points.findIndex((pnt) => pnt.id === id);
         if (index > -1) points.splice(index, 1);
-        draw();
+        // draw();
     });
 
     const checkbox = pointCard.querySelector('.enable');
@@ -160,7 +160,7 @@ addPoint.addEventListener('click', () => {
         checkbox.style.backgroundColor = checkbox.checked
             ? vectors[index].color
             : null;
-        draw();
+        // draw();
     });
 
     const cellX = pointCard.querySelector('.cell.x');
@@ -178,7 +178,7 @@ addPoint.addEventListener('click', () => {
                     y: asNumY,
                 },
             };
-            draw();
+            // draw();
         }
     };
 
@@ -190,6 +190,92 @@ addPoint.addEventListener('click', () => {
     addDblClick(cellY, readPointValues);
 
     pointList.append(pointCard);
+});
+
+const funcTemplate = document.querySelector('#func-card');
+const funcList = document.querySelector('#funclist');
+const addFunc = document.querySelector('#addfunc');
+
+let funcIdTracker = 0;
+
+addFunc.addEventListener('click', () => {
+    const funcCard = funcTemplate.content.firstElementChild.cloneNode(true);
+    const id = funcIdTracker++;
+
+    funcCard.dataset.id = id;
+
+    funcs.push({
+        id,
+        isActive: true,
+        color: colorToString(randomColor()),
+        isRainbow: false,
+        func: '',
+        mathExp: null,
+    });
+    // draw();
+
+    funcCard.querySelector('.delete').addEventListener('click', () => {
+        funcCard.remove();
+        const index = funcs.findIndex((func) => func.id === id);
+        if (index > -1) funcs.splice(index, 1);
+        // draw();
+    });
+
+    const checkbox = funcCard.querySelector('.enable');
+
+    const index = funcs.findIndex((func) => func.id === id);
+    checkbox.style.backgroundColor = checkbox.checked
+        ? funcs[index].color
+        : null;
+
+    checkbox.addEventListener('change', () => {
+        const index = funcs.findIndex((func) => func.id === id);
+        funcs[index] = {
+            ...funcs[index],
+            isActive: checkbox.checked,
+        };
+        checkbox.style.backgroundColor = checkbox.checked
+            ? funcs[index].color
+            : null;
+        // draw();
+    });
+
+    const rainbowCheckbox = funcCard.querySelector('.rainbow-check');
+
+    rainbowCheckbox.addEventListener('change', () => {
+        const index = funcs.findIndex((func) => func.id === id);
+        funcs[index] = {
+            ...funcs[index],
+            isRainbow: rainbowCheckbox.checked,
+        };
+        // draw();
+    });
+
+    const funcInput = funcCard.querySelector('.func-eqn');
+
+    funcInput.addEventListener('input', () => {
+        try {
+            const compiledEquation = math.compile(funcInput.value);
+            // test equation
+            compiledEquation.evaluate({ x: 0 });
+
+            funcInput.classList.remove('has-error');
+
+            const index = funcs.findIndex((func) => func.id === id);
+            funcs[index] = {
+                ...funcs[index],
+                func: funcInput.value,
+                mathExp: compiledEquation,
+            };
+            // draw();
+        } catch (e) {
+            funcInput.classList.add('has-error');
+            // console.log(e);
+            return;
+        }
+    });
+
+    funcList.append(funcCard);
 });
 
 const matrixTemplate = document.querySelector('#matrix-card');
@@ -210,13 +296,13 @@ addMatrix.addEventListener('click', () => {
         i: { x: 1, y: 0 },
         j: { x: 0, y: 1 },
     });
-    draw();
+    // draw();
 
     matrixCard.querySelector('.delete').addEventListener('click', () => {
         matrixCard.remove();
         const index = matrices.findIndex((mat) => mat.id === id);
         if (index > -1) matrices.splice(index, 1);
-        draw();
+        // draw();
     });
 
     const checkbox = matrixCard.querySelector('.enable');
@@ -230,7 +316,7 @@ addMatrix.addEventListener('click', () => {
         checkbox.style.backgroundColor = checkbox.checked
             ? matrices[index].color
             : null;
-        draw();
+        // draw();
     });
 
     const iX = matrixCard.querySelector('.cell.i-x');
@@ -255,7 +341,7 @@ addMatrix.addEventListener('click', () => {
                 i: { x: asNumIX, y: asNumIY },
                 j: { x: asNumJX, y: asNumJY },
             };
-            draw();
+            // draw();
         }
     };
 
@@ -279,14 +365,14 @@ const buttonStrength = 1.2;
 document.querySelector('#zoomout').addEventListener('click', () => {
     zoomFactor *= buttonStrength;
     init();
-    draw();
+    // draw();
 });
 
 document.querySelector('#zoomin').addEventListener('click', () => {
     if (zoomFactor > 0.1) {
         zoomFactor /= buttonStrength;
         init();
-        draw();
+        // draw();
     }
 });
 
@@ -346,14 +432,14 @@ let zoomThrottlePause;
 canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
 
-    zoomFactor = Math.max(0.1, zoomFactor + e.deltaY * 0.01);
+    zoomFactor = Math.min(Math.max(0.5, zoomFactor + e.deltaY * 0.01), 50);
 
     if (zoomThrottlePause) return;
     zoomThrottlePause = true;
 
     setTimeout(() => {
-        draw();
+        // draw();
 
         zoomThrottlePause = false;
-    }, 80);
+    }, 40);
 });

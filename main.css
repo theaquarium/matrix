@@ -54,6 +54,7 @@ input[type='checkbox'] {
 
 input[type='checkbox']:checked {
     background: #d7fbe1;
+    /* background: #aec9ff; */
 }
 
 input[type='checkbox']:checked::after {
@@ -79,6 +80,16 @@ input[type='checkbox']:checked::after {
 
 .header {
     flex-shrink: 0;
+    margin: 0;
+    margin-bottom: 1rem;
+}
+
+#logo {
+    height: 2rem;
+    display: inline;
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+    transform: translateY(0.1rem);
 }
 
 .eqn {
@@ -89,8 +100,9 @@ input[type='checkbox']:checked::after {
 }
 
 .eqn h2 {
-    margin: 0.6rem 0;
-    margin-top: 1rem;
+    margin: 0;
+    margin-top: 0.8rem;
+    font-size: 1.6rem;
 }
 
 .eqn p {
@@ -101,13 +113,14 @@ input[type='checkbox']:checked::after {
 
 #addvector,
 #addmatrix,
-#addpoint {
-    margin-top: 0.5rem;
+#addpoint,
+#addfunc {
+    /* margin-top: 0.5rem; */
     width: 100%;
 }
 
 .footer {
-    padding: 1rem;
+    padding-top: 0.5rem;
     flex-shrink: 0;
     text-align: center;
     font-size: 1rem;
@@ -173,20 +186,22 @@ input[type='checkbox']:checked::after {
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
 
 /* Firefox */
 input[type='number'] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 #basis {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
+    /* margin-bottom: 1rem; */
+    /* flex-wrap: wrap; */
 }
 
 #basis > .vector {
@@ -201,7 +216,7 @@ input[type='number'] {
     cursor: pointer;
     background: #eee;
     transition: background 0.1s;
-    margin: 0.5rem;
+    /* margin: 0.5rem; */
     margin-bottom: 1rem;
 }
 
@@ -309,6 +324,10 @@ button:hover {
     font-family: 'Roboto Mono', monospace;
 }
 
+#basis-header {
+    margin: 0;
+}
+
 #ihat,
 #jhat {
     padding: 0.2rem;
@@ -412,6 +431,61 @@ button:hover {
     background-size: 8px 2px;
     background-position: top left, top right, bottom left, bottom right;
     font-family: 'Roboto Mono', monospace;
+}
+
+.func-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 0.5rem 0;
+    padding: 0.8rem 1rem;
+    background: #e8e8e8;
+    border-radius: 0.5rem;
+    border: 2px solid #666;
+}
+
+.func {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em 0.8em;
+    background-repeat: no-repeat;
+    background-size: 8px 2px;
+    background-position: top left, top right, bottom left, bottom right;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.9rem;
+}
+
+.func-eqn-container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.func-eqn-wrapper {
+    flex: 1;
+}
+
+.func-eqn {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.5rem;
+    width: 100%;
+    outline: none;
+    border: 1px solid #222;
+    border-radius: 2px;
+    padding: 0.1rem;
+    background: #e8e8e8;
+    text-align: center;
+    cursor: text;
+}
+
+.func-eqn.has-error {
+    background: #d99d9d;
 }
 
 @media (max-width: 600px) {

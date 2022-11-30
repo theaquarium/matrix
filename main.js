@@ -11,6 +11,7 @@ let gridSize = 0;
 let vectors = [];
 let points = [];
 let matrices = [];
+let funcs = [];
 
 let zoomFactor = 1;
 
@@ -296,6 +297,59 @@ function drawPoint({ x, y }, color) {
     ctx.fill();
 }
 
+function drawFunc(funcExp, rainbow, colorPreset) {
+    const gridCount = GRID_SIZES[gridSize].size;
+
+    const countX = gridCount * 2 + 1;
+
+    if (rainbow) {
+        const intervalSize = 0.25;
+
+        for (let x = -1 * gridCount; x <= gridCount; x += intervalSize) {
+            const pointId = x + gridCount;
+            const color = colorToString(HSVtoRGB(pointId / countX, 0.75, 1));
+
+            const y = funcExp.evaluate({ x });
+
+            const pnt = point(trans({ x, y }));
+            ctx.beginPath();
+            ctx.fillStyle = 'black';
+            ctx.arc(pnt.x, pnt.y, 8, 0, Math.PI * 2, false);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.arc(pnt.x, pnt.y, 6, 0, Math.PI * 2, false);
+            ctx.fill();
+        }
+    } else {
+        let y = funcExp.evaluate({ x: -1 * gridCount });
+
+        ctx.beginPath();
+
+        ctx.strokeStyle = colorPreset;
+        ctx.lineWidth = 5;
+
+        const pntStart = point(trans({ x: -1 * gridCount, y }));
+        ctx.moveTo(pntStart.x, pntStart.y);
+
+        const intervalSize = 0.25;
+
+        for (
+            let x = -1 * gridCount + intervalSize;
+            x <= gridCount;
+            x += intervalSize
+        ) {
+            y = funcExp.evaluate({ x });
+
+            const pnt = point(trans({ x, y }));
+            ctx.lineTo(pnt.x, pnt.y);
+        }
+
+        ctx.stroke();
+    }
+}
+
 function drawRainbowPoints() {
     const gridCount = GRID_SIZES[gridSize].size;
 
@@ -318,7 +372,10 @@ const jX = document.querySelector('#j-x');
 const jY = document.querySelector('#j-y');
 
 function draw(timestamp) {
+    requestAnimationFrame(draw);
+
     const newMatrix = matrixProduct(matrices);
+    // const newMatrix = liveMatrix.matrix;
     if (ANIM_SPEEDS[animSpeed].speed === 0) {
         startMatrix = endMatrix;
         endMatrix = newMatrix;
@@ -328,7 +385,7 @@ function draw(timestamp) {
         liveMatrix.animStart = 0;
         startMatrix = endMatrix;
         endMatrix = newMatrix;
-        requestAnimationFrame(draw);
+        // requestAnimationFrame(draw);
         return;
     }
 
@@ -347,7 +404,7 @@ function draw(timestamp) {
         if (t === 1) {
             liveMatrix.animating = false;
         } else {
-            requestAnimationFrame(draw);
+            // requestAnimationFrame(draw);
         }
     }
 
@@ -389,6 +446,21 @@ function draw(timestamp) {
         );
     }
 
+    funcs.forEach((func) => {
+        if (!func.isActive || func.mathExp === null) return;
+
+        drawFunc(func.mathExp, func.isRainbow, func.color);
+        if (drawVectorLabels) {
+            const labelPoint = {
+                x: 1,
+                y: func.mathExp.evaluate({ x: 3 }),
+            };
+
+            const transLabelPoint = trans(labelPoint);
+            labelledText(func.func, transLabelPoint);
+        }
+    });
+
     vectors.forEach((vec) => {
         if (!vec.isActive) return;
 
@@ -406,7 +478,7 @@ function draw(timestamp) {
         if (!point.isActive) return;
 
         const transPnt = trans(point.coord);
-        drawPoint(trans(point.coord), point.color);
+        drawPoint(transPnt, point.color);
         if (drawVectorLabels) {
             labelledText(
                 `(${niceRound(transPnt.x)}, ${niceRound(transPnt.y)})`,
@@ -425,7 +497,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
         init();
-        draw();
+        // draw();
     }, 500);
 });
 
@@ -439,7 +511,7 @@ window.addEventListener('resize', () => {
         init();
 
         // Rerender
-        draw();
+        // draw();
 
         throttlePause = false;
     }, 100);

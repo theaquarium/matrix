@@ -18,37 +18,45 @@
         <link
             rel="apple-touch-icon"
             sizes="180x180"
-            href="favicons/apple-touch-icon.png"
+            href="favicons/apple-touch-icon.png?v=2"
         />
         <link
             rel="icon"
             type="image/png"
             sizes="32x32"
-            href="favicons/favicon-32x32.png"
+            href="favicons/favicon-32x32.png?v=2"
         />
         <link
             rel="icon"
             type="image/png"
             sizes="16x16"
-            href="favicons/favicon-16x16.png"
+            href="favicons/favicon-16x16.png?v=2"
         />
-        <link rel="manifest" href="favicons/site.webmanifest" />
+        <link rel="manifest" href="favicons/site.webmanifest?v=2" />
         <link
             rel="mask-icon"
-            href="favicons/safari-pinned-tab.svg"
-            color="#aec9ff"
+            href="favicons/safari-pinned-tab.svg?v=2"
+            color="#444444"
         />
-        <link rel="shortcut icon" href="favicons/favicon.ico" />
+        <link rel="shortcut icon" href="favicons/favicon.ico?v=2" />
         <meta name="msapplication-TileColor" content="#eeeeee" />
         <meta
             name="msapplication-config"
-            content="favicons/browserconfig.xml"
+            content="favicons/browserconfig.xml?v=2"
+        />
+        <meta name="theme-color" content="#d7fbe1" />
+        <meta name="msapplication-TileColor" content="#eeeeee" />
+        <meta
+            name="msapplication-config"
+            content="favicons/browserconfig.xml?v=2"
         />
         <meta name="theme-color" content="#ffffff" />
     </head>
     <body>
         <div class="sidebar">
-            <h1 class="header">🤖 Matrix Math</h1>
+            <h1 class="header">
+                <img id="logo" src="logo.svg" alt="" />Matrix Math
+            </h1>
             <div id="menu" class="is-closed">
                 <div id="menu-header">
                     <svg
@@ -80,7 +88,7 @@
                     <button id="basisvecs">Turn off î and ĵ</button>
                     <button id="size">Change grid size (Small)</button>
                     <button id="grid">Turn off grid</button>
-                    <button id="veclabels">Turn on vector/point labels</button>
+                    <button id="veclabels">Turn on object labels</button>
                     <button id="speed">Change animation speed (Fast)</button>
                 </div>
             </div>
@@ -136,11 +144,18 @@
                     <div id="pointlist"></div>
                     <button id="addpoint">Add Point</button>
                 </div>
+
+                <h2 id="funcs-header">Functions</h2>
+                <p>See how functions change.</p>
+                <div id="funcs">
+                    <div id="funclist"></div>
+                    <button id="addfunc">Add Function</button>
+                </div>
             </div>
             <div class="footer">
-                Get in touch at
+                <!-- Get in touch at
                 <a href="mailto:leah@vashevko.com">leah@vashevko.com</a>
-                <br />
+                <br /> -->
                 Made with ❤️ by
                 <a href="https://leah.vashevko.com">Leah Vashevko</a>
             </div>
@@ -309,9 +324,38 @@
                 </button>
             </div>
         </template>
+        <template id="func-card">
+            <div class="func-input">
+                <input type="checkbox" class="enable" checked />
+                <div class="func">
+                    <div class="func-eqn-container">
+                        <label>y =&nbsp;</label>
+                        <div class="func-eqn-wrapper">
+                            <input type="text" class="func-eqn" />
+                        </div>
+                    </div>
+                    <div class="rainbow-container">
+                        <label>As Points: </label>
+                        <input type="checkbox" class="rainbow-check" />
+                    </div>
+                </div>
+                <button class="delete">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="bi bi-trash-fill"
+                        viewBox="0 0 16 16"
+                    >
+                        <path
+                            d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"
+                        />
+                    </svg>
+                </button>
+            </div>
+        </template>
 
         <script src="https://unpkg.com/@popperjs/core@2"></script>
         <script src="https://unpkg.com/tippy.js@6"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.4.0/math.min.js"></script>
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"
             integrity="sha512-Eezs+g9Lq4TCCq0wae01s9PuNWzHYoCMkE97e2qdkYthpI0pzC3UGB03lgEHn2XM85hDOUF6qgqqszs+iXU4UA=="

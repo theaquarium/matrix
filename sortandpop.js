@@ -8,7 +8,7 @@ const sorter = Sortable.create(matrixList, {
                 return matrices.find((mat) => mat.id === parseInt(id));
             });
 
-            draw();
+            // draw();
         },
     },
 });
@@ -52,6 +52,17 @@ tippy('#points-header', {
     content: `
     <p>Observe how the position of points changes.</p>
     <p>Drag a cell to change its value.</p>
+    `,
+    allowHTML: true,
+    placement: 'bottom-start',
+    arrow: false,
+    animation: 'fade',
+});
+
+tippy('#funcs-header', {
+    content: `
+    <p>See how functions change.</p>
+    <p>Enter an equation to graph it.</p>
     `,
     allowHTML: true,
     placement: 'bottom-start',
