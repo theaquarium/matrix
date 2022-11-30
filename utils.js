@@ -41,7 +41,7 @@ function HSVtoRGB(h, s, v) {
 }
 
 function randomColor() {
-    return HSVtoRGB(Math.random(), 0.75, 1);
+    return HSVtoRGB(Math.random(), 0.75, 0.85);
 }
 
 function colorToString({ r, g, b }) {
