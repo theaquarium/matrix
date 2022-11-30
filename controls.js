@@ -152,13 +152,13 @@ addPoint.addEventListener('click', () => {
         : null;
 
     checkbox.addEventListener('change', () => {
-        const index = vectors.findIndex((vec) => vec.id === id);
-        vectors[index] = {
-            ...vectors[index],
+        const index = points.findIndex((pnt) => pnt.id === id);
+        points[index] = {
+            ...points[index],
             isActive: checkbox.checked,
         };
         checkbox.style.backgroundColor = checkbox.checked
-            ? vectors[index].color
+            ? points[index].color
             : null;
         // draw();
     });

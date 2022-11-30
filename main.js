@@ -497,8 +497,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
         init();
-        // draw();
     }, 500);
+
+    setTimeout(() => {
+        init();
+    }, 1000);
+
+    setTimeout(() => {
+        init();
+    }, 2000);
 });
 
 let throttlePause;
