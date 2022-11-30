@@ -292,10 +292,7 @@ function drawVector({ x, y }, color) {
     const h = TRIANGLE_SIZE * Math.sin(Math.PI / 3);
 
     // top vertex
-    ctx.lineTo(
-        pntEnd.x + Math.cos(theta) * h + triangleXOffset,
-        pntEnd.y - Math.sin(theta) * h + triangleYOffset,
-    );
+    ctx.lineTo(pntEnd.x, pntEnd.y);
 
     // bottom right vertex
     ctx.lineTo(
