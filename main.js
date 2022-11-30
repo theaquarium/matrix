@@ -62,6 +62,10 @@ let startMatrix = {
     i: { x: 1, y: 0 },
     j: { x: 0, y: 1 },
 };
+let startMatrixRT = {
+    iRT: { theta: 0, r: 1 },
+    jRT: { theta: Math.PI / 2, r: 1 },
+};
 let liveMatrix = {
     animStart: 0,
     animating: false,
@@ -73,6 +77,10 @@ let liveMatrix = {
 let endMatrix = {
     i: { x: 1, y: 0 },
     j: { x: 0, y: 1 },
+};
+let endMatrixRT = {
+    iRT: { theta: 0, r: 1 },
+    jRT: { theta: Math.PI / 2, r: 1 },
 };
 
 // Setup Canvases
@@ -384,7 +392,9 @@ function draw(timestamp) {
         liveMatrix.animating = true;
         liveMatrix.animStart = 0;
         startMatrix = endMatrix;
+        startMatrixRT = matrixToRT(endMatrix);
         endMatrix = newMatrix;
+        endMatrixRT = matrixToRT(newMatrix);
         // requestAnimationFrame(draw);
         return;
     }
@@ -399,7 +409,10 @@ function draw(timestamp) {
             (timestamp - liveMatrix.animStart) / ANIM_SPEEDS[animSpeed].speed,
             1,
         );
-        liveMatrix.matrix = lerpMatrix(startMatrix, endMatrix, t);
+        liveMatrix.matrix = matrixToXY(
+            lerpRTMatrix(startMatrixRT, endMatrixRT, t),
+        );
+        // liveMatrix.matrix = lerpMatrix(startMatrix, endMatrix, t);
 
         if (t === 1) {
             liveMatrix.animating = false;

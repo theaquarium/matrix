@@ -96,3 +96,42 @@ function lerpMatrix(a, b, t) {
         j: { x: lerpNum(a.j.x, b.j.x, t), y: lerpNum(a.j.y, b.j.y, t) },
     };
 }
+
+function matrixToRT(matrix) {
+    return {
+        iRT: {
+            theta: Math.atan2(matrix.i.y, matrix.i.x),
+            r: Math.sqrt(Math.pow(matrix.i.x, 2) + Math.pow(matrix.i.y, 2)),
+        },
+        jRT: {
+            theta: Math.atan2(matrix.j.y, matrix.j.x),
+            r: Math.sqrt(Math.pow(matrix.j.x, 2) + Math.pow(matrix.j.y, 2)),
+        },
+    };
+}
+
+function matrixToXY(matrix) {
+    return {
+        i: {
+            x: matrix.iRT.r * Math.cos(matrix.iRT.theta),
+            y: matrix.iRT.r * Math.sin(matrix.iRT.theta),
+        },
+        j: {
+            x: matrix.jRT.r * Math.cos(matrix.jRT.theta),
+            y: matrix.jRT.r * Math.sin(matrix.jRT.theta),
+        },
+    };
+}
+
+function lerpRTMatrix(a, b, t) {
+    return {
+        iRT: {
+            r: lerpNum(a.iRT.r, b.iRT.r, t),
+            theta: lerpNum(a.iRT.theta, b.iRT.theta, t),
+        },
+        jRT: {
+            r: lerpNum(a.jRT.r, b.jRT.r, t),
+            theta: lerpNum(a.jRT.theta, b.jRT.theta, t),
+        },
+    };
+}
