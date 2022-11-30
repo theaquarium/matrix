@@ -363,17 +363,17 @@ addMatrix.addEventListener('click', () => {
 
 const buttonStrength = 1.2;
 document.querySelector('#zoomout').addEventListener('click', () => {
-    zoomFactor *= buttonStrength;
-    init();
+    zoomFactor = Math.min(50, zoomFactor * buttonStrength);
+    // init();
     // draw();
 });
 
 document.querySelector('#zoomin').addEventListener('click', () => {
-    if (zoomFactor > 0.1) {
-        zoomFactor /= buttonStrength;
-        init();
-        // draw();
-    }
+    zoomFactor = Math.max(0.3, zoomFactor / buttonStrength);
+    // init();
+    // if (zoomFactor > 0.1) {
+    //     // draw();
+    // }
 });
 
 const addDblClick = (input, callback) => {
@@ -432,7 +432,7 @@ let zoomThrottlePause;
 canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
 
-    zoomFactor = Math.min(Math.max(0.5, zoomFactor + e.deltaY * 0.01), 50);
+    zoomFactor = Math.min(Math.max(0.3, zoomFactor + e.deltaY * 0.01), 50);
 
     if (zoomThrottlePause) return;
     zoomThrottlePause = true;
