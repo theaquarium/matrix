@@ -415,7 +415,7 @@ const makeDraggable = (input, callback, elToStopDrag) => {
             callback();
 
             throttlePause = false;
-        }, 50);
+        }, 25);
     }
 
     function mouseupNum(e) {
