@@ -42,6 +42,8 @@ document.querySelector('#size').addEventListener('click', (e) => {
     // draw();
 });
 
+const draggablesContainer = document.querySelector('#draggables-container');
+
 const vectorTemplate = document.querySelector('#vector-card');
 const vectorList = document.querySelector('#vectorlist');
 const addVector = document.querySelector('#addvector');
@@ -54,11 +56,16 @@ addVector.addEventListener('click', () => {
 
     vectorCard.dataset.id = id;
 
+    const draggingCursor = document.createElement('div');
+    draggingCursor.classList.add('dragging-cursor');
+    draggablesContainer.appendChild(draggingCursor);
+
     vectors.push({
         id,
         isActive: true,
         color: colorToString(randomColor()),
         vec: { x: 1, y: 1 },
+        cursor: draggingCursor,
     });
     // draw();
 
@@ -114,6 +121,29 @@ addVector.addEventListener('click', () => {
     addDblClick(cellX, readVectorValues);
     addDblClick(cellY, readVectorValues);
 
+    // dragging cursor
+    addDraggingCursor(
+        draggingCursor,
+        () => {
+            const index = vectors.findIndex((vec) => vec.id === id);
+            return vectors[index].vec;
+        },
+        ({ x, y }) => {
+            const index = vectors.findIndex((vec) => vec.id === id);
+            vectors[index] = {
+                ...vectors[index],
+                vec: {
+                    x: x,
+                    y: y,
+                },
+            };
+        },
+        ({ x, y }) => {
+            cellX.value = x.toFixed(2);
+            cellY.value = y.toFixed(2);
+        },
+    );
+
     vectorList.append(vectorCard);
 });
 
@@ -129,11 +159,16 @@ addPoint.addEventListener('click', () => {
 
     pointCard.dataset.id = id;
 
+    const draggingCursor = document.createElement('div');
+    draggingCursor.classList.add('dragging-cursor');
+    draggablesContainer.appendChild(draggingCursor);
+
     points.push({
         id,
         isActive: true,
         color: colorToString(randomColor()),
         coord: { x: 1, y: 1 },
+        cursor: draggingCursor,
     });
     // draw();
 
@@ -188,6 +223,29 @@ addPoint.addEventListener('click', () => {
     makeDraggable(cellY, readPointValues);
     addDblClick(cellX, readPointValues);
     addDblClick(cellY, readPointValues);
+
+    // dragging cursor
+    addDraggingCursor(
+        draggingCursor,
+        () => {
+            const index = points.findIndex((pnt) => pnt.id === id);
+            return points[index].coord;
+        },
+        ({ x, y }) => {
+            const index = points.findIndex((pnt) => pnt.id === id);
+            points[index] = {
+                ...points[index],
+                coord: {
+                    x: x,
+                    y: y,
+                },
+            };
+        },
+        ({ x, y }) => {
+            cellX.value = x.toFixed(2);
+            cellY.value = y.toFixed(2);
+        },
+    );
 
     pointList.append(pointCard);
 });
@@ -284,7 +342,7 @@ const addMatrix = document.querySelector('#addmatrix');
 
 let matrixIdTracker = 0;
 
-addMatrix.addEventListener('click', () => {
+const addMatrixCard = () => {
     const matrixCard = matrixTemplate.content.firstElementChild.cloneNode(true);
     const id = matrixIdTracker++;
 
@@ -295,6 +353,8 @@ addMatrix.addEventListener('click', () => {
         isActive: true,
         i: { x: 1, y: 0 },
         j: { x: 0, y: 1 },
+        // this marks matrices created by dragging basis vectors
+        isDragged: false,
     });
     // draw();
 
@@ -340,6 +400,8 @@ addMatrix.addEventListener('click', () => {
                 ...matrices[index],
                 i: { x: asNumIX, y: asNumIY },
                 j: { x: asNumJX, y: asNumJY },
+                // once a user modifies it, we have to make a new one for dragging
+                isDragged: false,
             };
             // draw();
         }
@@ -359,7 +421,71 @@ addMatrix.addEventListener('click', () => {
     addDblClick(jY, readMatrixValues);
 
     matrixList.append(matrixCard);
-});
+
+    // returned for dragging basis vectors
+    return matrixCard;
+};
+
+addMatrix.addEventListener('click', addMatrixCard);
+
+// basis vector dragging
+basisDraggingCursorI = document.createElement('div');
+basisDraggingCursorI.classList.add('dragging-cursor');
+draggablesContainer.appendChild(basisDraggingCursorI);
+
+basisDraggingCursorJ = document.createElement('div');
+basisDraggingCursorJ.classList.add('dragging-cursor');
+draggablesContainer.appendChild(basisDraggingCursorJ);
+
+let currentDraggingId = null;
+let currentDraggingCells = {
+    iX: null,
+    iY: null,
+    jX: null,
+    jY: null,
+};
+addDraggingCursor(
+    basisDraggingCursorI,
+    () => {
+        const index = matrices.findIndex((mat) => mat.id === currentDraggingId);
+        if (
+            currentDraggingId === null ||
+            index < 0 ||
+            !matrices[index].isDragged
+        ) {
+            matrices.forEach((_, index) => {
+                matrices[index].isActive = false;
+            });
+
+            const matrixCard = addMatrixCard();
+            const draggingMatrix = matrices[matrices.length - 1];
+            draggingMatrix.isDragged = true;
+            currentDraggingId = draggingMatrix.id;
+            currentDraggingCells = {
+                iX: matrixCard.querySelector('.cell.i-x'),
+                iY: matrixCard.querySelector('.cell.i-y'),
+                jX: matrixCard.querySelector('.cell.j-x'),
+                jY: matrixCard.querySelector('.cell.j-y'),
+            };
+        }
+        return liveMatrix.matrix.i;
+    },
+    ({ x, y }) => {
+        const index = matrices.findIndex((mat) => mat.id === currentDraggingId);
+        matrices[index] = {
+            ...matrices[index],
+            i: {
+                x: x,
+                y: y,
+            },
+        };
+    },
+    ({ x, y }) => {
+        currentDraggingCells.iX.value = x.toFixed(2);
+        currentDraggingCells.iY.value = y.toFixed(2);
+    },
+    true,
+);
 
 const buttonStrength = 1.2;
 document.querySelector('#zoomout').addEventListener('click', () => {
@@ -415,7 +541,7 @@ const makeDraggable = (input, callback, elToStopDrag) => {
             callback();
 
             throttlePause = false;
-        }, 25);
+        }, 80);
     }
 
     function mouseupNum(e) {
@@ -429,7 +555,7 @@ const makeDraggable = (input, callback, elToStopDrag) => {
 };
 
 let zoomThrottlePause;
-canvas.addEventListener('wheel', (e) => {
+draggablesContainer.addEventListener('wheel', (e) => {
     e.preventDefault();
 
     zoomFactor = Math.min(Math.max(0.3, zoomFactor + e.deltaY * 0.01), 50);
@@ -441,5 +567,72 @@ canvas.addEventListener('wheel', (e) => {
         // draw();
 
         zoomThrottlePause = false;
-    }, 40);
+    }, 10);
 });
+
+function addDraggingCursor(
+    cursor,
+    // getCurrentPoint MUST only be called once on mousedown, it can have side effects
+    getCurrentPoint,
+    changeCallback,
+    // expensive callback is throttled (use for changing DOM, etc)
+    expensiveChangeCallback,
+    // useRawPoints disables translating (used for basis vectors)
+    useRawPoints,
+) {
+    let startingPoint = { x: 0, y: 0 };
+    let mouseStartPosition = {
+        x: 0,
+        y: 0,
+    };
+    let scaleFactor = 1;
+
+    function mousedown(e) {
+        startingPoint = useRawPoints
+            ? getCurrentPoint()
+            : trans(getCurrentPoint());
+        mouseStartPosition = {
+            x: e.pageX,
+            y: e.pageY,
+        };
+        scaleFactor = getScaleFactor() / window.devicePixelRatio;
+
+        cursor.classList.add('is-dragging');
+
+        // add listeners for mousemove, mouseup
+        window.addEventListener('mousemove', mousemove);
+        window.addEventListener('mouseup', mouseup);
+    }
+
+    let throttlePause;
+    function mousemove(e) {
+        const diffX = (mouseStartPosition.x - e.pageX) / scaleFactor;
+        const diffY = (mouseStartPosition.y - e.pageY) / scaleFactor;
+        const newPoint = {
+            x: startingPoint.x - diffX,
+            y: startingPoint.y + diffY,
+        };
+
+        const unTrans = useRawPoints ? newPoint : inverseTrans(newPoint);
+
+        changeCallback(unTrans);
+
+        if (throttlePause) return;
+        throttlePause = true;
+
+        setTimeout(() => {
+            expensiveChangeCallback(unTrans);
+
+            throttlePause = false;
+        }, 100);
+    }
+
+    function mouseup() {
+        // add listeners for mousemove, mouseup
+        cursor.classList.remove('is-dragging');
+        window.removeEventListener('mousemove', mousemove);
+        window.removeEventListener('mouseup', mouseup);
+    }
+
+    cursor.addEventListener('mousedown', mousedown);
+}

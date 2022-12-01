@@ -135,3 +135,11 @@ function lerpRTMatrix(a, b, t) {
         },
     };
 }
+
+function invertMatrix(m) {
+    const det = m.i.x * m.j.y - m.i.y * m.j.x;
+    return {
+        i: { x: m.j.y / det, y: (-1 * m.i.y) / det },
+        j: { x: (-1 * m.j.x) / det, y: m.i.x / det },
+    };
+}

@@ -13,6 +13,9 @@ let points = [];
 let matrices = [];
 let funcs = [];
 
+let basisDraggingCursorI = null;
+let basisDraggingCursorJ = null;
+
 let zoomFactor = 1;
 
 const MIN_UNITS = 3.5;
@@ -73,6 +76,11 @@ let liveMatrix = {
         i: { x: 1, y: 0 },
         j: { x: 0, y: 1 },
     },
+};
+// not accurate while animating
+let liveInverse = {
+    i: { x: 1, y: 0 },
+    j: { x: 0, y: 1 },
 };
 let endMatrix = {
     i: { x: 1, y: 0 },
@@ -146,10 +154,15 @@ function labelledText(text, coordPoint, font = 25, fontFamily = 'Roboto Mono') {
     ctx.fillText(text, x + textXOffset, y + textYOffset);
 }
 
-function point({ x, y }) {
-    let scaleFactor =
+function getScaleFactor() {
+    return (
         Math.min(pixelWidth / (2 * MIN_UNITS), pixelHeight / (2 * MIN_UNITS)) /
-        zoomFactor;
+        zoomFactor
+    );
+}
+
+function point({ x, y }) {
+    let scaleFactor = getScaleFactor();
 
     return {
         x: x * scaleFactor + pixelWidth / 2,
@@ -161,6 +174,13 @@ function trans({ x, y }) {
     return {
         x: x * liveMatrix.matrix.i.x + y * liveMatrix.matrix.j.x,
         y: x * liveMatrix.matrix.i.y + y * liveMatrix.matrix.j.y,
+    };
+}
+
+function inverseTrans({ x, y }) {
+    return {
+        x: x * liveInverse.i.x + y * liveInverse.j.x,
+        y: x * liveInverse.i.y + y * liveInverse.j.y,
     };
 }
 
@@ -430,6 +450,9 @@ function draw(timestamp) {
         } else {
             // requestAnimationFrame(draw);
         }
+    } else {
+        // only calculate when not animating
+        liveInverse = invertMatrix(liveMatrix.matrix);
     }
 
     // Reset Canvas
@@ -468,6 +491,24 @@ function draw(timestamp) {
             }`,
             liveMatrix.matrix.j,
         );
+
+        if (basisDraggingCursorI && basisDraggingCursorJ) {
+            const pixelCoordsI = point(liveMatrix.matrix.i);
+            basisDraggingCursorI.style.top = `${
+                pixelCoordsI.y / window.devicePixelRatio
+            }px`;
+            basisDraggingCursorI.style.left = `${
+                pixelCoordsI.x / window.devicePixelRatio
+            }px`;
+
+            const pixelCoordsJ = point(liveMatrix.matrix.j);
+            basisDraggingCursorJ.style.top = `${
+                pixelCoordsJ.y / window.devicePixelRatio
+            }px`;
+            basisDraggingCursorJ.style.left = `${
+                pixelCoordsJ.x / window.devicePixelRatio
+            }px`;
+        }
     }
 
     funcs.forEach((func) => {
@@ -496,18 +537,44 @@ function draw(timestamp) {
                 transVec,
             );
         }
+
+        if (liveMatrix.animating) {
+            // console.log(vec);
+            const pixelCoords = point(trans(vec.vec));
+            // console.log(pixelCoords);
+            vec.cursor.style.top = `${
+                pixelCoords.y / window.devicePixelRatio
+            }px`;
+            vec.cursor.style.left = `${
+                pixelCoords.x / window.devicePixelRatio
+            }px`;
+            // console.log(vec.cursor);
+        }
     });
 
-    points.forEach((point) => {
-        if (!point.isActive) return;
+    points.forEach((pnt) => {
+        if (!pnt.isActive) return;
 
-        const transPnt = trans(point.coord);
-        drawPoint(transPnt, point.color);
+        const transPnt = trans(pnt.coord);
+        drawPoint(transPnt, pnt.color);
         if (drawVectorLabels) {
             labelledText(
                 `(${niceRound(transPnt.x)}, ${niceRound(transPnt.y)})`,
                 transPnt,
             );
+        }
+
+        if (!liveMatrix.animating) {
+            // console.log(vec);
+            const pixelCoords = point(trans(pnt.coord));
+            // console.log(pixelCoords);
+            pnt.cursor.style.top = `${
+                pixelCoords.y / window.devicePixelRatio
+            }px`;
+            pnt.cursor.style.left = `${
+                pixelCoords.x / window.devicePixelRatio
+            }px`;
+            // console.log(vec.cursor);
         }
     });
 
