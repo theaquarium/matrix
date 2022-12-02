@@ -71,6 +71,7 @@ addVector.addEventListener('click', () => {
 
     vectorCard.querySelector('.delete').addEventListener('click', () => {
         vectorCard.remove();
+        draggingCursor.remove();
         const index = vectors.findIndex((vec) => vec.id === id);
         if (index > -1) vectors.splice(index, 1);
         // draw();
@@ -174,6 +175,7 @@ addPoint.addEventListener('click', () => {
 
     pointCard.querySelector('.delete').addEventListener('click', () => {
         pointCard.remove();
+        draggingCursor.remove();
         const index = points.findIndex((pnt) => pnt.id === id);
         if (index > -1) points.splice(index, 1);
         // draw();
@@ -451,14 +453,20 @@ addDraggingCursor(
         if (
             currentDraggingId === null ||
             index < 0 ||
-            !matrices[index].isDragged
+            !matrices[index].isDragged ||
+            !matrices[index].isActive
         ) {
-            matrices.forEach((_, index) => {
+            matrices.forEach((mat, index) => {
                 matrices[index].isActive = false;
+                document.querySelector(
+                    `.matrix-input[data-id='${mat.id}'] > .enable`,
+                ).checked = false;
             });
 
             const matrixCard = addMatrixCard();
             const draggingMatrix = matrices[matrices.length - 1];
+            draggingMatrix.i = liveMatrix.matrix.i;
+            draggingMatrix.j = liveMatrix.matrix.j;
             draggingMatrix.isDragged = true;
             currentDraggingId = draggingMatrix.id;
             currentDraggingCells = {
@@ -467,6 +475,10 @@ addDraggingCursor(
                 jX: matrixCard.querySelector('.cell.j-x'),
                 jY: matrixCard.querySelector('.cell.j-y'),
             };
+            currentDraggingCells.iX.value = draggingMatrix.i.x.toFixed(2);
+            currentDraggingCells.iY.value = draggingMatrix.i.y.toFixed(2);
+            currentDraggingCells.jX.value = draggingMatrix.j.x.toFixed(2);
+            currentDraggingCells.jY.value = draggingMatrix.j.y.toFixed(2);
         }
         return liveMatrix.matrix.i;
     },
@@ -483,6 +495,58 @@ addDraggingCursor(
     ({ x, y }) => {
         currentDraggingCells.iX.value = x.toFixed(2);
         currentDraggingCells.iY.value = y.toFixed(2);
+    },
+    true,
+);
+addDraggingCursor(
+    basisDraggingCursorJ,
+    () => {
+        const index = matrices.findIndex((mat) => mat.id === currentDraggingId);
+        if (
+            currentDraggingId === null ||
+            index < 0 ||
+            !matrices[index].isDragged ||
+            !matrices[index].isActive
+        ) {
+            matrices.forEach((mat, index) => {
+                matrices[index].isActive = false;
+                document.querySelector(
+                    `.matrix-input[data-id='${mat.id}'] > .enable`,
+                ).checked = false;
+            });
+
+            const matrixCard = addMatrixCard();
+            const draggingMatrix = matrices[matrices.length - 1];
+            draggingMatrix.isDragged = true;
+            draggingMatrix.i = liveMatrix.matrix.i;
+            draggingMatrix.j = liveMatrix.matrix.j;
+            currentDraggingId = draggingMatrix.id;
+            currentDraggingCells = {
+                iX: matrixCard.querySelector('.cell.i-x'),
+                iY: matrixCard.querySelector('.cell.i-y'),
+                jX: matrixCard.querySelector('.cell.j-x'),
+                jY: matrixCard.querySelector('.cell.j-y'),
+            };
+            currentDraggingCells.iX.value = draggingMatrix.i.x.toFixed(2);
+            currentDraggingCells.iY.value = draggingMatrix.i.y.toFixed(2);
+            currentDraggingCells.jX.value = draggingMatrix.j.x.toFixed(2);
+            currentDraggingCells.jY.value = draggingMatrix.j.y.toFixed(2);
+        }
+        return liveMatrix.matrix.j;
+    },
+    ({ x, y }) => {
+        const index = matrices.findIndex((mat) => mat.id === currentDraggingId);
+        matrices[index] = {
+            ...matrices[index],
+            j: {
+                x: x,
+                y: y,
+            },
+        };
+    },
+    ({ x, y }) => {
+        currentDraggingCells.jX.value = x.toFixed(2);
+        currentDraggingCells.jY.value = y.toFixed(2);
     },
     true,
 );
@@ -588,6 +652,10 @@ function addDraggingCursor(
     let scaleFactor = 1;
 
     function mousedown(e) {
+        e.preventDefault();
+
+        isDragging = true;
+
         startingPoint = useRawPoints
             ? getCurrentPoint()
             : trans(getCurrentPoint());
@@ -606,6 +674,8 @@ function addDraggingCursor(
 
     let throttlePause;
     function mousemove(e) {
+        e.preventDefault();
+
         const diffX = (mouseStartPosition.x - e.pageX) / scaleFactor;
         const diffY = (mouseStartPosition.y - e.pageY) / scaleFactor;
         const newPoint = {
@@ -627,7 +697,11 @@ function addDraggingCursor(
         }, 100);
     }
 
-    function mouseup() {
+    function mouseup(e) {
+        e.preventDefault();
+
+        isDragging = false;
+
         // add listeners for mousemove, mouseup
         cursor.classList.remove('is-dragging');
         window.removeEventListener('mousemove', mousemove);

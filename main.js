@@ -15,6 +15,7 @@ let funcs = [];
 
 let basisDraggingCursorI = null;
 let basisDraggingCursorJ = null;
+let isDragging = false;
 
 let zoomFactor = 1;
 
@@ -410,12 +411,13 @@ const iX = document.querySelector('#i-x');
 const iY = document.querySelector('#i-y');
 const jX = document.querySelector('#j-x');
 const jY = document.querySelector('#j-y');
+const dragCursorContainer = document.querySelector('#draggables-container');
 
 function draw(timestamp) {
     requestAnimationFrame(draw);
 
     const newMatrix = matrixProduct(matrices);
-    if (ANIM_SPEEDS[animSpeed].speed === 0) {
+    if (ANIM_SPEEDS[animSpeed].speed === 0 || isDragging) {
         startMatrix = endMatrix;
         endMatrix = newMatrix;
         liveMatrix.matrix = newMatrix;
@@ -433,6 +435,8 @@ function draw(timestamp) {
     if (liveMatrix.animating && timestamp) {
         if (liveMatrix.animStart === 0) {
             liveMatrix.animStart = timestamp;
+
+            dragCursorContainer.classList.add('is-animating');
         }
 
         // max out at 1
@@ -447,6 +451,7 @@ function draw(timestamp) {
 
         if (t === 1) {
             liveMatrix.animating = false;
+            dragCursorContainer.classList.remove('is-animating');
         } else {
             // requestAnimationFrame(draw);
         }
@@ -538,7 +543,7 @@ function draw(timestamp) {
             );
         }
 
-        if (liveMatrix.animating) {
+        if (!liveMatrix.animating) {
             // console.log(vec);
             const pixelCoords = point(trans(vec.vec));
             // console.log(pixelCoords);
