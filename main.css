@@ -552,3 +552,7 @@ button:hover {
     background: #9bcba89b;
     cursor: grabbing;
 }
+
+.dragging-cursor.is-hidden {
+    display: none;
+}

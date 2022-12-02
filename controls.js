@@ -13,6 +13,14 @@ document.querySelector('#rainbow').addEventListener('click', (e) => {
 document.querySelector('#basisvecs').addEventListener('click', (e) => {
     drawBasisVecs = !drawBasisVecs;
     e.target.innerText = `${drawBasisVecs ? 'Turn off' : 'Turn on'} î and ĵ`;
+
+    if (drawBasisVecs) {
+        basisDraggingCursorI.classList.remove('is-hidden');
+        basisDraggingCursorJ.classList.remove('is-hidden');
+    } else {
+        basisDraggingCursorI.classList.add('is-hidden');
+        basisDraggingCursorJ.classList.add('is-hidden');
+    }
     // draw();
 });
 
@@ -93,6 +101,12 @@ addVector.addEventListener('click', () => {
         checkbox.style.backgroundColor = checkbox.checked
             ? vectors[index].color
             : null;
+
+        if (checkbox.checked) {
+            draggingCursor.classList.remove('is-hidden');
+        } else {
+            draggingCursor.classList.add('is-hidden');
+        }
         // draw();
     });
 
@@ -197,6 +211,12 @@ addPoint.addEventListener('click', () => {
         checkbox.style.backgroundColor = checkbox.checked
             ? points[index].color
             : null;
+
+        if (checkbox.checked) {
+            draggingCursor.classList.remove('is-hidden');
+        } else {
+            draggingCursor.classList.add('is-hidden');
+        }
         // draw();
     });
 
