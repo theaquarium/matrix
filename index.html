@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Matrix Math</title>
 
+        <link rel="canonical" href="https://martinelsaesser.github.io/matrix/">
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -356,8 +357,12 @@
 
         <script>
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register("sw.js");
-            }
+                navigator.serviceWorker.register('/matrix/sw.js', { scope: "/matrix/" }) .then(function (reg) {
+                    console.log('Registration was successfully. Scope is: ' + reg.scope);
+                }).catch(function (error) {
+                    console.log('Faulty registration. Error: ' + error);
+                });
+            };
         </script>
         <script src="https://unpkg.com/@popperjs/core@2"></script>
         <script src="https://unpkg.com/tippy.js@6"></script>
