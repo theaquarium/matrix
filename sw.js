@@ -5,7 +5,6 @@ const RUNTIME = 'runtime';
 const PRECACHE_URLS = [
     "/matrix/",
     "/matrix/controls.js",
-    "/matrix/favicons",
     "/matrix/favicons/android-chrome-192x192.png",
     "/matrix/favicons/android-chrome-256x256.png",
     "/matrix/favicons/android-chrome-512x512.png",
