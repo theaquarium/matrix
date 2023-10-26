@@ -52,7 +52,8 @@ function niceRound(n) {
     return Math.round((n + Number.EPSILON) * 100) / 100;
 }
 
-function flippedFloor(n) {
+// Math.ceil rounds -1.2 to -1, but this rounds it to -2
+function ceilWithNegatives(n) {
     return (
         Math.max(Math.abs(Math.floor(n)), Math.abs(Math.ceil(n))) *
         (n < 0 ? -1 : 1)

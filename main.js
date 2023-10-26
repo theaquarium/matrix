@@ -18,6 +18,10 @@ let basisDraggingCursorJ = null;
 let isDragging = false;
 
 let zoomFactor = 1;
+let panCenter = {
+    x: 0,
+    y: 0,
+};
 
 const MIN_UNITS = 3.5;
 const EXTRA_FACTOR = 1;
@@ -166,8 +170,18 @@ function point({ x, y }) {
     let scaleFactor = getScaleFactor();
 
     return {
-        x: x * scaleFactor + pixelWidth / 2,
-        y: -1 * y * scaleFactor + pixelHeight / 2,
+        x: (x + panCenter.x) * scaleFactor + pixelWidth / 2,
+        y: -1 * (y + panCenter.y) * scaleFactor + pixelHeight / 2,
+    };
+}
+
+// get point from mouse coords on page
+function unpoint({ mouseX, mouseY }) {
+    let scaleFactor = getScaleFactor();
+
+    return {
+        x: (mouseX - pixelWidth / 2) / scaleFactor - panCenter.x,
+        y: (-1 * (mouseY - pixelHeight / 2)) / scaleFactor - panCenter.y,
     };
 }
 
@@ -191,13 +205,12 @@ function drawOrientGrid() {
     // draw orient axes
     ctx.strokeStyle = orientColor;
 
+    ctx.beginPath();
     for (
-        let x = flippedFloor(-1 * safetyX * zoomFactor);
-        x <= flippedFloor(safetyX * zoomFactor);
+        let x = ceilWithNegatives(-1 * safetyX * zoomFactor - panCenter.x);
+        x <= ceilWithNegatives(safetyX * zoomFactor - panCenter.x);
         x += 1
     ) {
-        ctx.beginPath();
-
         if (x === 0) {
             ctx.lineWidth = 5;
         } else {
@@ -207,16 +220,13 @@ function drawOrientGrid() {
         const pnt = point({ x, y: 0 });
         ctx.moveTo(pnt.x, 0);
         ctx.lineTo(pnt.x, pixelHeight);
-        ctx.stroke();
     }
 
     for (
-        let y = flippedFloor(-1 * safetyY * zoomFactor);
-        y <= flippedFloor(safetyY * zoomFactor);
+        let y = ceilWithNegatives(-1 * safetyY * zoomFactor - panCenter.y);
+        y <= ceilWithNegatives(safetyY * zoomFactor - panCenter.y);
         y += 1
     ) {
-        ctx.beginPath();
-
         if (y === 0) {
             ctx.lineWidth = 5;
         } else {
@@ -226,8 +236,8 @@ function drawOrientGrid() {
         const pnt = point({ x: 0, y });
         ctx.moveTo(0, pnt.y);
         ctx.lineTo(pixelWidth, pnt.y);
-        ctx.stroke();
     }
+    ctx.stroke();
 }
 
 function drawTransGrid() {
@@ -238,13 +248,12 @@ function drawTransGrid() {
 
     const gridCount = GRID_SIZES[gridSize].size;
 
+    ctx.beginPath();
     for (
         let x = -1 * EXTRA_FACTOR * gridCount;
         x <= EXTRA_FACTOR * gridCount;
         x += 1
     ) {
-        ctx.beginPath();
-
         if (x === 0) {
             ctx.lineWidth = 5;
         } else {
@@ -255,7 +264,6 @@ function drawTransGrid() {
         const pntEnd = point(trans({ x, y: EXTRA_FACTOR * gridCount }));
         ctx.moveTo(pntStart.x, pntStart.y);
         ctx.lineTo(pntEnd.x, pntEnd.y);
-        ctx.stroke();
     }
 
     for (
@@ -263,8 +271,6 @@ function drawTransGrid() {
         y <= EXTRA_FACTOR * gridCount;
         y += 1
     ) {
-        ctx.beginPath();
-
         if (y === 0) {
             ctx.lineWidth = 5;
         } else {
@@ -275,8 +281,8 @@ function drawTransGrid() {
         const pntEnd = point(trans({ x: EXTRA_FACTOR * gridCount, y }));
         ctx.moveTo(pntStart.x, pntStart.y);
         ctx.lineTo(pntEnd.x, pntEnd.y);
-        ctx.stroke();
     }
+    ctx.stroke();
 }
 
 function drawVector({ x, y }, color) {

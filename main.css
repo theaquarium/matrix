@@ -1,5 +1,5 @@
 * {
-    touch-action: manipulation;
+    touch-action: none;
 }
 
 html,
@@ -177,7 +177,8 @@ input[type='checkbox']:checked::after {
     padding: 0.1rem;
     background: #e8e8e8;
     text-align: center;
-    cursor: ns-resize;
+    /* cursor: ns-resize; */
+    cursor: text;
 }
 
 .cell.is-dragging {
@@ -372,8 +373,7 @@ button:hover {
     top: 1rem;
 }
 
-#zoomin,
-#zoomout {
+#zoombuttons > * {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -382,8 +382,7 @@ button:hover {
     margin: 0.5rem;
 }
 
-#zoomin > svg,
-#zoomout > svg {
+#zoombuttons svg {
     fill: '#222';
     width: 1.5rem;
     height: 1.5rem;
@@ -525,6 +524,8 @@ button:hover {
     -moz-user-select: none; /* Firefox all */
     -ms-user-select: none; /* IE 10+ */
     user-select: none; /* Likely future */
+
+    overflow: hidden;
 }
 
 #draggables-container.is-animating .dragging-cursor {

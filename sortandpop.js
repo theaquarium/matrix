@@ -1,6 +1,8 @@
 const sorter = Sortable.create(matrixList, {
     animation: 150,
     ghostClass: 'is-sorting',
+    filter: '.cell',
+    preventOnFilter: false,
     store: {
         set: (sortable) => {
             const order = sortable.toArray();

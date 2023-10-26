@@ -131,8 +131,8 @@ addVector.addEventListener('click', () => {
 
     cellX.addEventListener('input', readVectorValues);
     cellY.addEventListener('input', readVectorValues);
-    makeDraggable(cellX, readVectorValues);
-    makeDraggable(cellY, readVectorValues);
+    // makeDraggable(cellX, readVectorValues);
+    // makeDraggable(cellY, readVectorValues);
     addDblClick(cellX, readVectorValues);
     addDblClick(cellY, readVectorValues);
 
@@ -241,8 +241,8 @@ addPoint.addEventListener('click', () => {
 
     cellX.addEventListener('input', readPointValues);
     cellY.addEventListener('input', readPointValues);
-    makeDraggable(cellX, readPointValues);
-    makeDraggable(cellY, readPointValues);
+    // makeDraggable(cellX, readPointValues);
+    // makeDraggable(cellY, readPointValues);
     addDblClick(cellX, readPointValues);
     addDblClick(cellY, readPointValues);
 
@@ -433,10 +433,10 @@ const addMatrixCard = () => {
     iY.addEventListener('input', readMatrixValues);
     jX.addEventListener('input', readMatrixValues);
     jY.addEventListener('input', readMatrixValues);
-    makeDraggable(iX, readMatrixValues, matrixCard);
-    makeDraggable(iY, readMatrixValues, matrixCard);
-    makeDraggable(jX, readMatrixValues, matrixCard);
-    makeDraggable(jY, readMatrixValues, matrixCard);
+    // makeDraggable(iX, readMatrixValues, matrixCard);
+    // makeDraggable(iY, readMatrixValues, matrixCard);
+    // makeDraggable(jX, readMatrixValues, matrixCard);
+    // makeDraggable(jY, readMatrixValues, matrixCard);
     addDblClick(iX, readMatrixValues);
     addDblClick(iY, readMatrixValues);
     addDblClick(jX, readMatrixValues);
@@ -571,21 +571,6 @@ addDraggingCursor(
     true,
 );
 
-const buttonStrength = 1.2;
-document.querySelector('#zoomout').addEventListener('click', () => {
-    zoomFactor = Math.min(50, zoomFactor * buttonStrength);
-    // init();
-    // draw();
-});
-
-document.querySelector('#zoomin').addEventListener('click', () => {
-    zoomFactor = Math.max(0.3, zoomFactor / buttonStrength);
-    // init();
-    // if (zoomFactor > 0.1) {
-    //     // draw();
-    // }
-});
-
 const addDblClick = (input, callback) => {
     const defaultValue = input.value;
 
@@ -638,20 +623,99 @@ const makeDraggable = (input, callback, elToStopDrag) => {
     input.addEventListener('mousedown', mousedownNum);
 };
 
-let zoomThrottlePause;
-draggablesContainer.addEventListener('wheel', (e) => {
+let panStartingPoint = { x: 0, y: 0 };
+let panMouseStartPosition = {
+    x: 0,
+    y: 0,
+};
+let panStartScaleFactor = 1;
+
+function panMousedown(e) {
     e.preventDefault();
 
-    zoomFactor = Math.min(Math.max(0.3, zoomFactor + e.deltaY * 0.01), 50);
+    panStartingPoint = panCenter;
+    panMouseStartPosition = {
+        x: e.pageX,
+        y: e.pageY,
+    };
+    panStartScaleFactor = getScaleFactor() / window.devicePixelRatio;
+
+    // add listeners for mousemove, mouseup
+    draggablesContainer.addEventListener('pointermove', panMousemove);
+    window.addEventListener('pointerup', panMouseup);
+}
+
+function panMousemove(e) {
+    e.preventDefault();
+
+    const diffX = (panMouseStartPosition.x - e.pageX) / panStartScaleFactor;
+    const diffY = (panMouseStartPosition.y - e.pageY) / panStartScaleFactor;
+
+    panCenter = {
+        x: panStartingPoint.x - diffX,
+        y: panStartingPoint.y + diffY,
+    };
+}
+
+function panMouseup(e) {
+    e.preventDefault();
+
+    // remove listeners for mousemove, mouseup
+    draggablesContainer.removeEventListener('pointermove', panMousemove);
+    window.removeEventListener('pointerup', panMouseup);
+}
+
+draggablesContainer.addEventListener('pointerdown', panMousedown);
+
+const buttonStrength = 1.2;
+document.querySelector('#zoomout').addEventListener('click', () => {
+    zoomFactor = Math.min(50, zoomFactor * buttonStrength);
+    // init();
+    // draw();
+});
+
+document.querySelector('#zoomin').addEventListener('click', () => {
+    zoomFactor = Math.max(0.3, zoomFactor / buttonStrength);
+    // init();
+    // if (zoomFactor > 0.1) {
+    //     // draw();
+    // }
+});
+
+document.querySelector('#zoomreset').addEventListener('click', () => {
+    zoomFactor = 1;
+    panCenter = {
+        x: 0,
+        y: 0,
+    };
+});
+
+let zoomThrottlePause = false;
+draggablesContainer.addEventListener('wheel', (e) => {
+    e.preventDefault();
 
     if (zoomThrottlePause) return;
     zoomThrottlePause = true;
 
-    setTimeout(() => {
-        // draw();
+    const scaleFactor = getScaleFactor();
+    const mouseX = e.offsetX * window.devicePixelRatio;
+    const mouseY = e.offsetY * window.devicePixelRatio;
+    const pointAtMouse = unpoint({ mouseX, mouseY });
 
-        zoomThrottlePause = false;
-    }, 10);
+    zoomFactor = Math.min(Math.max(0.3, zoomFactor + e.deltaY * 0.003), 50);
+
+    const resultingPoint = point({
+        x: pointAtMouse.x,
+        y: pointAtMouse.y,
+    });
+
+    const diffX = (resultingPoint.x - mouseX) / scaleFactor;
+    const diffY = (-1 * (resultingPoint.y - mouseY)) / scaleFactor;
+
+    panCenter.x -= diffX;
+    panCenter.y -= diffY;
+
+    zoomThrottlePause = false;
 });
 
 function addDraggingCursor(
@@ -673,6 +737,7 @@ function addDraggingCursor(
 
     function mousedown(e) {
         e.preventDefault();
+        e.stopPropagation();
 
         isDragging = true;
 
@@ -688,13 +753,14 @@ function addDraggingCursor(
         cursor.classList.add('is-dragging');
 
         // add listeners for mousemove, mouseup
-        window.addEventListener('mousemove', mousemove);
-        window.addEventListener('mouseup', mouseup);
+        window.addEventListener('pointermove', mousemove);
+        window.addEventListener('pointerup', mouseup);
     }
 
     let throttlePause;
     function mousemove(e) {
         e.preventDefault();
+        e.stopPropagation();
 
         const diffX = (mouseStartPosition.x - e.pageX) / scaleFactor;
         const diffY = (mouseStartPosition.y - e.pageY) / scaleFactor;
@@ -719,14 +785,15 @@ function addDraggingCursor(
 
     function mouseup(e) {
         e.preventDefault();
+        e.stopPropagation();
 
         isDragging = false;
 
-        // add listeners for mousemove, mouseup
+        // remove listeners for mousemove, mouseup
         cursor.classList.remove('is-dragging');
-        window.removeEventListener('mousemove', mousemove);
-        window.removeEventListener('mouseup', mouseup);
+        window.removeEventListener('pointermove', mousemove);
+        window.removeEventListener('pointerup', mouseup);
     }
 
-    cursor.addEventListener('mousedown', mousedown);
+    cursor.addEventListener('pointerdown', mousedown);
 }
