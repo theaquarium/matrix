@@ -2,7 +2,7 @@
 
 Online matrix math linear transformation visualizer.
 
-Check it out at [https://matrix.leah.vashevko.com](https://matrix.leah.vashevko.com).
+Check it out at [https://matrix.leahvashevko.com](https://matrix.leahvashevko.com).
 
 ## License
 
